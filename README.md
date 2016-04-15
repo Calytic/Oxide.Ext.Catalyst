@@ -8,57 +8,57 @@ Plugin & dependency management extension by [RustServers.IO](http://rustservers.
 
 ### Usage
 
-**Update**
+* **Update**
 
-Updates all plugins to latest versions
+  Updates all plugins to latest versions
 
-````catalyst.update *````
+  ````catalyst.update *````
 
-Updates specified plugins to latest versions
+  Updates specified plugins to latest versions
 
-````catalyst.update PluginName [PluginName] [...]````
+  ````catalyst.update PluginName [PluginName] [...]````
 
-**Require**
+* **Require**
 
-Installs specified plugins on server
+  Installs specified plugins on server
 
-````catalyst.require PluginName [PluginName] [...]````
+  ````catalyst.require PluginName [PluginName] [...]````
 
-**Remove**
+* **Remove**
 
-Uninstalls specified plugins from server
+  Uninstalls specified plugins from server
 
-````catalyst.remove PluginName [PluginName] [...]````
+  ````catalyst.remove PluginName [PluginName] [...]````
 
-**Source Service**
+* **Source Service**
 
-Add/Remove source service where plugins made be found
+  Add/Remove source service where plugins made be found
 
-````catalyst.source http://source.url.com````
+  ````catalyst.source http://source.url.com````
 
-**Configuration**
+* **Configuration**
 
-Command-line editing of plugin configuration files (alpha)
+  Command-line editing of plugin configuration files (alpha)
 
-````catalyst.config Setting.SubSetting [NewValue]````
+  ````catalyst.config Setting.SubSetting [NewValue]````
 
-**Search**
+* **Search**
 
-Search available source repositories for a plugin by name, description, or requirements
+  Search available source repositories for a plugin by name, description, or requirements
 
-````catalyst.search search terms````
+  ````catalyst.search search terms````
 
-**Info**
+* **Info**
 
-Find available information on a specific plugin
+  Find available information on a specific plugin
 
-````catalyst.info PluginName````
+  ````catalyst.info PluginName````
 
-**Validate**
+* **Validate**
 
-Check if requirements are valid
+  Check if requirements are valid
 
-``catalyst.validate``
+  ``catalyst.validate``
 
 ### Contribute
 
