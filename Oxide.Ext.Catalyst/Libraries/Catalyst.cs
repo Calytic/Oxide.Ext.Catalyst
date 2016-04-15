@@ -15,6 +15,8 @@ using Oxide.Core.Libraries;
 using Oxide.Core.Plugins;
 using Oxide.Plugins;
 
+using UnityEngine;
+
 namespace Oxide.Ext.Catalyst.Libraries
 {
 	public class Catalyst : Library
@@ -65,13 +67,12 @@ namespace Oxide.Ext.Catalyst.Libraries
 		private bool _running = true;
 		public CatalystSettings Settings;
 
-		private Oxide.Ext.Catalyst.Plugins.Catalyst _CatalystPlugin;
-
 		private WebClient _WebClient = new WebClient();
+		CatalystExtension Extension;
 
-		public Catalyst(Oxide.Ext.Catalyst.Plugins.Catalyst catalystPlugin)
+		public Catalyst(CatalystExtension catalystExtension)
 		{
-			_CatalystPlugin = catalystPlugin;
+			Extension = catalystExtension;
 			_DataFileSystem = Interface.Oxide.DataFileSystem;
 			_ConfigDirectory = Interface.Oxide.ConfigDirectory;
 			_DataDirectory = Interface.Oxide.DataDirectory;
@@ -86,7 +87,7 @@ namespace Oxide.Ext.Catalyst.Libraries
 		public void CheckConfig() {
 			Settings = _DataFileSystem.ReadObject<CatalystSettings>(Path.Combine(_ConfigDirectory, "Catalyst"));
 
-			if (Settings.SourceList == null)
+			if (Settings.Version == null)
 			{
 				Settings = new CatalystSettings();
 				Settings.Debug = false;
@@ -95,6 +96,7 @@ namespace Oxide.Ext.Catalyst.Libraries
 				};
 				Settings.Require = new Dictionary<string, string>();
 				Settings.RequireDev = new Dictionary<string, string>();
+				Settings.Version = Extension.Version.ToString();
 
 				SaveConfig ();
 			}
@@ -174,15 +176,21 @@ namespace Oxide.Ext.Catalyst.Libraries
 			commitActions.Add (new CommitAction (CommitType.Remove, name, path));
 		}
 
-		public void BeginCommit() 
+		public void BeginCommit ()
 		{
-			isValidCommit = false;
+			if (Settings.Debug) {
+				Debug.Log("Begin Commit");
+			}
+			isValidCommit = true;
 			commitErrors = new List<string>();
 			pluginCache = new Dictionary<string, JObject>();
 		}
 
 		private string Error (string msg)
 		{
+			if (Settings.Debug) {
+				Debug.Log("Commit Error: " + msg);
+			}
 			isValidCommit = false;
 			commitErrors.Add(msg);
 			return msg;
@@ -190,17 +198,23 @@ namespace Oxide.Ext.Catalyst.Libraries
 
 		public void EndCommit ()
 		{
+			if (Settings.Debug) {
+				Debug.Log ("End Commit");
+			}
 			if (!isValidCommit) {
-				StringBuilder sb = new StringBuilder();
-				foreach (string error in commitErrors) {
-					sb.AppendLine(error);
+				if (commitErrors.Count () > 0) {
+					foreach (string error in commitErrors) {
+						Interface.Oxide.LogError (error);
+					}
 				}
-				Interface.Oxide.LogError(sb.ToString());
 				return;
 			}
 
 			foreach (CommitAction commit in commitActions) 
 			{
+				if (Settings.Debug) {
+					Debug.Log(commit.type.ToString() + ": " + commit.name);
+				}
 				switch (commit.type) {
 				case CommitType.Write:
 					System.IO.File.WriteAllText (commit.path, commit.src);

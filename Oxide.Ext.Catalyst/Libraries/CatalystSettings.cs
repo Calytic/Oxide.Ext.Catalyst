@@ -15,7 +15,7 @@ namespace Oxide.Ext.Catalyst
 		public bool Debug { get; set; }
 		public Dictionary<string, string> Require { get; set; }
 		public Dictionary<string, string> RequireDev { get; set; }
-		public VersionNumber Version { get; set; }
+		public string Version { get; set; }
 	}
 }
 

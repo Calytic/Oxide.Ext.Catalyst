@@ -14,29 +14,46 @@ using System.Reflection;
 using System.Text;
 using System.Timers;
 using UnityEngine;
+using Oxide.Game.Rust.Libraries;
 
 namespace Oxide.Ext.Catalyst.Plugins
 {
 	public class Catalyst : CSPlugin
 	{
+		private CatalystExtension Extension;
+		private Oxide.Ext.Catalyst.Libraries.Catalyst library;
 		private Core.Libraries.Plugins plugins = Interface.Oxide.GetLibrary<Core.Libraries.Plugins>();
-		Oxide.Ext.Catalyst.Libraries.Catalyst library;
-		private void Init()
-		{
+
+		public Catalyst(CatalystExtension extension)
+	    {
+			this.Name = "Catalyst";
+			this.Title = "Catalyst Plugin Manager / RustServers.IO";
+			this.Author = "Calytic";
+			this.Version = extension.Version;
+			this.HasConfig = true;
+	    	Extension = extension;
+	    }
+
+		[HookMethod("Init")]
+	    private void Init()
+	    {
 			library = Interface.Oxide.GetLibrary<Oxide.Ext.Catalyst.Libraries.Catalyst> ("Catalyst");
-			Oxide.Game.Rust.Libraries.Command command = Interface.Oxide.GetLibrary<Oxide.Game.Rust.Libraries.Command>("Command");
-			command.AddConsoleCommand("catalyst.update", (Plugin) this, "ccUpdate");
-			command.AddConsoleCommand("catalyst.require", (Plugin) this, "ccRequire");
-			command.AddConsoleCommand("catalyst.remove", (Plugin) this, "ccRemove");
-			command.AddConsoleCommand("catalyst.validate", (Plugin) this, "ccValidate");
-			command.AddConsoleCommand("catalyst.source", (Plugin) this, "ccSource");
-			command.AddConsoleCommand("catalyst.config", (Plugin) this, "ccConfig");
+			Command command = Interface.Oxide.GetLibrary<Command>("Command");
+			command.AddConsoleCommand("catalyst.update", this, "ccUpdate");
+			command.AddConsoleCommand("catalyst.require", this, "ccRequire");
+			command.AddConsoleCommand("catalyst.remove", this, "ccRemove");
+			command.AddConsoleCommand("catalyst.validate", this, "ccValidate");
+			command.AddConsoleCommand("catalyst.source", this, "ccSource");
+			command.AddConsoleCommand("catalyst.config", this, "ccConfig");
+			Interface.Oxide.LogInfo("[Catalyst] Loaded");
 		}
 
-		[ConsoleCommand("catalyst.config")]
+		[HookMethod("ccConfig")]
 		void ccConfig (ConsoleSystem.Arg arg)
 		{
-			if (arg.connection != null && arg.connection.authLevel < 2) {
+			if (arg.connection != null)
+			{
+				arg.ReplyWith("Permission Denied");
 				return;
 			}
 
@@ -68,11 +85,12 @@ namespace Oxide.Ext.Catalyst.Plugins
 			}
 		}
 
-		[ConsoleCommand("catalyst.source")]
+		[HookMethod("ccSource")]
 		void ccSource(ConsoleSystem.Arg arg)
 		{
-			if (arg.connection != null && arg.connection.authLevel < 2)
+			if (arg.connection != null)
 			{
+				arg.ReplyWith("Permission Denied");
 				return;
 			}
 
@@ -97,16 +115,20 @@ namespace Oxide.Ext.Catalyst.Plugins
 			}
 		}
 
-		[ConsoleCommand("catalyst.update")]
+		[HookMethod("ccUpdate")]
 		void ccUpdate(ConsoleSystem.Arg arg)
 		{
-			if (arg.connection != null && arg.connection.authLevel < 2)
+			if (arg.connection != null)
 			{
+				arg.ReplyWith("Permission Denied");
 				return;
 			}
 
 			if (arg.Args.Length == 1) {
 				string name = arg.Args [0];
+				if (library.Settings.Debug) {
+					Debug.Log("Updating " + name);
+				}
 
 				library.BeginCommit();
 				HandleResult (library.UpdatePlugin (name), "Updating " + name);
@@ -120,16 +142,22 @@ namespace Oxide.Ext.Catalyst.Plugins
 			}
 		}
 
-		[ConsoleCommand("catalyst.require")]
-		void ccRequire(ConsoleSystem.Arg arg)
+		[HookMethod("ccRequire")]
+		void ccRequire (ConsoleSystem.Arg arg)
 		{
-			if (arg.connection != null && arg.connection.authLevel < 2)
+			arg.ReplyWith("Requiring..");
+			if (arg.connection != null)
 			{
+				arg.ReplyWith("Permission Denied");
 				return;
 			}
 
 			if (arg.Args.Length == 1) {
 				string name = arg.Args [0];
+
+				if (library.Settings.Debug) {
+					Debug.Log("Requiring " + name);
+				}
 
 				library.BeginCommit();
 				HandleResult(library.InstallPlugin (name), "Installing " + name);
@@ -137,16 +165,21 @@ namespace Oxide.Ext.Catalyst.Plugins
 			}
 		}
 
-		[ConsoleCommand("catalyst.remove")]
+		[HookMethod("ccRemove")]
 		void ccRemove(ConsoleSystem.Arg arg)
 		{
-			if (arg.connection != null && arg.connection.authLevel < 2)
+			if (arg.connection != null)
 			{
+				arg.ReplyWith("Permission Denied");
 				return;
 			}
 
 			if (arg.Args.Length == 1) {
 				string name = arg.Args [0];
+
+				if (library.Settings.Debug) {
+					Debug.Log("Removing " + name);
+				}
 
 				library.BeginCommit();
 				HandleResult(library.RemovePlugin (name), "Removing " + name);
@@ -154,15 +187,21 @@ namespace Oxide.Ext.Catalyst.Plugins
 			}
 		}
 
-		[ConsoleCommand("catalyst.validate")]
+		[HookMethod("ccValidate")]
 		void ccValidate(ConsoleSystem.Arg arg)
 		{
-			if (arg.connection != null && arg.connection.authLevel < 2)
+			if (arg.connection != null)
 			{
+				arg.ReplyWith("Permission Denied");
 				return;
 			}
 
 			int errors = 0;
+
+			if (library.Settings.Debug) {
+				Debug.Log("Validating");
+			}
+
 			foreach (KeyValuePair<string, string> kvp in library.Settings.Require) {
 				var obj = library.GetPluginInfo (kvp.Key);
 				if (obj == null) {
