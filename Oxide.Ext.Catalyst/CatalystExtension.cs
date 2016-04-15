@@ -13,7 +13,7 @@ namespace Oxide.Ext.Catalyst
 	public class CatalystExtension : Extension
 	{
 		public static CatalystExtension Instance { get; private set; }
-		public static Libraries.Catalyst _Catalyst { get; private set; }
+		public static Libraries.Catalyst CatalystLibrary { get; private set; }
 		public static Plugins.Catalyst CatalystPlugin { get; private set; }
 		public CatalystExtension(ExtensionManager manager) : base(manager)
 		{
@@ -33,12 +33,13 @@ namespace Oxide.Ext.Catalyst
 		public override void Load()
 		{
 			this.Manager.RegisterPluginLoader(new Plugins.PluginLoader(this));
-			Manager.RegisterLibrary("Catalyst", _Catalyst = new Libraries.Catalyst(this));
+			CatalystLibrary = new Libraries.Catalyst(this);
+			Manager.RegisterLibrary("Catalyst", CatalystLibrary);
 		}
 
 		public override void LoadPluginWatchers(string plugindir)
 		{
-			_Catalyst?.Initialize();
+			CatalystLibrary?.Initialize();
 		}
 
 		public override void OnModLoad()
@@ -48,7 +49,7 @@ namespace Oxide.Ext.Catalyst
 
 		public override void OnShutdown()
 		{
-			_Catalyst?.Shutdown();
+			CatalystLibrary?.Shutdown();
 		}
 	}
 }

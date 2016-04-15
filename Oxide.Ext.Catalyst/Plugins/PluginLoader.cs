@@ -32,9 +32,7 @@ namespace Oxide.Ext.Catalyst.Plugins
 			switch (name) {
 				case "Catalyst":
 					Plugins.Catalyst catalystPlugin = new Plugins.Catalyst (Extension);
-					try {
-						LoadedPlugins.Add (name, catalystPlugin);
-					} catch (Exception ex) { }
+					LoadedPlugins.Add (name, catalystPlugin);
 					return (Plugin) catalystPlugin;
 			    default:
 		      		return (Plugin) null;

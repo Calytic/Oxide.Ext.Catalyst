@@ -52,6 +52,7 @@ namespace Oxide.Ext.Catalyst.Libraries
 		List<CommitAction> commitActions = new List<CommitAction> ();
 		List<string> commitErrors = new List<string>();
 		private bool isValidCommit = false;
+		public bool IsCommitting = false;
 		private Dictionary<string, JObject> pluginCache = new Dictionary<string, JObject>();
 
 		private Core.Libraries.WebRequests webrequest = Interface.Oxide.GetLibrary<Core.Libraries.WebRequests>();
@@ -64,11 +65,17 @@ namespace Oxide.Ext.Catalyst.Libraries
 		private readonly string _PluginDirectory;
 		private readonly DataFileSystem _DataFileSystem;
 
-		private bool _running = true;
 		public CatalystSettings Settings;
 
 		private WebClient _WebClient = new WebClient();
 		CatalystExtension Extension;
+
+		private string[] exts = {
+			"cs",
+			"py",
+			"lua",
+			"js"
+		};
 
 		public Catalyst(CatalystExtension catalystExtension)
 		{
@@ -78,21 +85,23 @@ namespace Oxide.Ext.Catalyst.Libraries
 			_DataDirectory = Interface.Oxide.DataDirectory;
 			_PluginDirectory = Interface.Oxide.PluginDirectory;
 		}
-		internal void Initialize()
+
+		internal void Initialize ()
 		{
-			Interface.Oxide.LogInfo("[Catalyst] Initializing");
 			CheckConfig ();
 		}
 
-		public void CheckConfig() {
-			Settings = _DataFileSystem.ReadObject<CatalystSettings>(Path.Combine(_ConfigDirectory, "Catalyst"));
-
-			if (Settings.Version == null)
-			{
+		public void CheckConfig ()
+		{
+			string path = Path.Combine (_ConfigDirectory, "Catalyst");
+			if (_DataFileSystem.ExistsDatafile (path)) {
+				Settings = _DataFileSystem.ReadObject<CatalystSettings> (path);
+			} else {
+				Interface.Oxide.LogInfo("[Catalyst] Creating Default Configuration");
 				Settings = new CatalystSettings();
 				Settings.Debug = false;
 				Settings.SourceList = new List<string>() {
-					"http://rustservers.io/p"
+					"http://rustservers.io"
 				};
 				Settings.Require = new Dictionary<string, string>();
 				Settings.RequireDev = new Dictionary<string, string>();
@@ -100,24 +109,62 @@ namespace Oxide.Ext.Catalyst.Libraries
 
 				SaveConfig ();
 			}
-
-			if (_running)
-			{
-				Interface.Oxide.LogInfo("[Catalyst] Initialized");
-			}
 		}
 
 		private void SaveConfig() {
 			_DataFileSystem.WriteObject<CatalystSettings>(Path.Combine(_ConfigDirectory, "Catalyst"), Settings);
 		}
 
-		internal void Shutdown()
+		public bool IsPluginInstalled (string plugin)
 		{
-			_running = false;
+			if (plugins.Exists (plugin)) {
+				return true;
+			}
+
+			foreach(string ext in exts) {
+				string path = Path.Combine (_PluginDirectory, plugin + "." + ext);
+				if(System.IO.File.Exists(path)) {
+					return true;
+				}
+			}
+
+			return false;
 		}
 
-		public bool IsPluginInstalled(string plugin) {
-			return plugins.Exists (plugin);
+		internal string[] FindPlugin (string name)
+		{
+			List<string> result = new List<string> ();
+			JObject results = null;
+			foreach (string source in Settings.SourceList) {
+				try {
+					results = JObject.Parse (_WebClient.DownloadString (source + "/s/" + name + ".json"));
+
+					if (results ["data"] == null) {
+						continue;
+					} else {
+						foreach (string r in results["data"]) {
+							result.Add (r);
+						}
+
+						return result.ToArray();
+					}
+				} catch (WebException ex) {
+					if (ex.Status == WebExceptionStatus.ProtocolError && ex.Response != null) {
+						var resp = (HttpWebResponse)ex.Response;
+						if (resp.StatusCode == HttpStatusCode.NotFound) { // HTTP 404
+							continue;
+						}
+					}
+					throw;
+				}
+			}
+
+			return null;
+		}
+
+		internal bool PluginExists (string name)
+		{
+			return GetPluginInfo(name) != null;
 		}
 
 		internal JObject GetPluginInfo (string name)
@@ -129,7 +176,7 @@ namespace Oxide.Ext.Catalyst.Libraries
 			JObject plugin = null;
 			foreach (string source in Settings.SourceList) {
 				try {
-					plugin = JObject.Parse (_WebClient.DownloadString (source + "/" + name + ".json"));
+					plugin = JObject.Parse (_WebClient.DownloadString (source + "/p/" + name + ".json"));
 
 					if(plugin["404"] != null) {
 						continue;
@@ -176,11 +223,12 @@ namespace Oxide.Ext.Catalyst.Libraries
 			commitActions.Add (new CommitAction (CommitType.Remove, name, path));
 		}
 
-		public void BeginCommit ()
+		internal void BeginCommit ()
 		{
 			if (Settings.Debug) {
-				Debug.Log("Begin Commit");
+				Interface.Oxide.LogInfo ("[Catalyst] Begin Commit");
 			}
+			IsCommitting = true;
 			isValidCommit = true;
 			commitErrors = new List<string>();
 			pluginCache = new Dictionary<string, JObject>();
@@ -189,18 +237,21 @@ namespace Oxide.Ext.Catalyst.Libraries
 		private string Error (string msg)
 		{
 			if (Settings.Debug) {
-				Debug.Log("Commit Error: " + msg);
+				Interface.Oxide.LogInfo ("[Catalyst] Commit Error: " + msg);
 			}
 			isValidCommit = false;
 			commitErrors.Add(msg);
 			return msg;
 		}
 
-		public void EndCommit ()
+		internal void EndCommit ()
 		{
 			if (Settings.Debug) {
-				Debug.Log ("End Commit");
+				Interface.Oxide.LogInfo ("[Catalyst] End Commit");
 			}
+
+			IsCommitting = false;
+
 			if (!isValidCommit) {
 				if (commitErrors.Count () > 0) {
 					foreach (string error in commitErrors) {
@@ -213,7 +264,7 @@ namespace Oxide.Ext.Catalyst.Libraries
 			foreach (CommitAction commit in commitActions) 
 			{
 				if (Settings.Debug) {
-					Debug.Log(commit.type.ToString() + ": " + commit.name);
+					Interface.Oxide.LogInfo ("[Catalyst] " + commit.type.ToString() + ": " + commit.name);
 				}
 				switch (commit.type) {
 				case CommitType.Write:
@@ -243,23 +294,28 @@ namespace Oxide.Ext.Catalyst.Libraries
 		public object InstallPlugin(string plugin) {
 			JObject pluginInfo = GetPluginInfo (plugin);
 			if (pluginInfo != null) {
-				return InstallPlugin (pluginInfo);
+				try {
+					return InstallPlugin (pluginInfo);
+				} catch (Exception ex) {
+					return Error(ex.Message);
+				}
 			}
 
 			return "No plugin found";
 		}
 
-		private object InstallPlugin (JObject pluginInfo, string version = "*")
+		internal object InstallPlugin (JObject pluginInfo, string version = "*")
 		{
 			string name = pluginInfo ["name"].ToString ();
-			if (IsPluginInstalled (name)) {
-				return Error ("Already installed");
-			}
 
 			string v = pluginInfo ["version"].ToString ();
 			bool matchingVersion = false;
-			if (v == version) {
-				matchingVersion = true;
+			if(IsPluginInstalled (name)) {
+
+				Plugin p = plugins.Find (name);
+				if (p.Version.ToString () == v) {
+					matchingVersion = true;
+				}
 			}
 
 			string ext = pluginInfo ["ext"].ToString ();
@@ -279,7 +335,7 @@ namespace Oxide.Ext.Catalyst.Libraries
 				if (!Settings.Require.ContainsKey (name)) {
 					CommitRequire (name, path, version);
 				}
-				if (!matchingVersion) {
+				if (!matchingVersion || !IsPluginInstalled (name)) {
 					string src = GetPluginSource (pluginInfo ["src"].ToString ().Replace (@"\", ""));
 					CommitWrite (name, path, version, src);
 				} 
@@ -290,10 +346,15 @@ namespace Oxide.Ext.Catalyst.Libraries
 			return false;
 		}
 
-		public object UpdatePlugin(string plugin) {
+		public object UpdatePlugin (string plugin)
+		{
 			JObject pluginInfo = GetPluginInfo (plugin);
 			if (pluginInfo != null) {
-				return UpdatePlugin (pluginInfo);
+				try {
+					return UpdatePlugin (pluginInfo);
+				} catch (Exception ex) {
+					return Error(ex.Message);
+				}
 			}
 
 			return Error("No plugin found");
@@ -303,12 +364,13 @@ namespace Oxide.Ext.Catalyst.Libraries
 		{
 			string name = pluginInfo ["name"].ToString ();
 			if (!IsPluginInstalled (name)) {
-				return Error ("Not installed");
+				return InstallPlugin (name);
 			}
 
 			string v = pluginInfo ["version"].ToString ();
 			bool matchingVersion = false;
-			if (v == version) {
+			Plugin p = plugins.Find (name);
+			if (p.Version.ToString () == v) {
 				matchingVersion = true;
 			}
 
@@ -340,33 +402,42 @@ namespace Oxide.Ext.Catalyst.Libraries
 			return false;
 		}
 
-		public object RemovePlugin(string plugin) {
+		public object RemovePlugin (string plugin)
+		{
 			JObject pluginInfo = GetPluginInfo (plugin);
 			if (pluginInfo != null) {
-				return RemovePlugin (pluginInfo);
+				try {
+					return RemovePlugin (pluginInfo);
+				} catch (Exception ex) {
+					return Error (ex.Message);
+				}
 			}
 
 			return Error("No plugin found");
 		}
 
-		internal object RemovePlugin(JObject pluginInfo) {
-			string name = pluginInfo ["name"].ToString();
-			if (!IsPluginInstalled (name)) {
-				return Error("Not installed");
-			}
+		internal object RemovePlugin (JObject pluginInfo)
+		{
+			string name = pluginInfo ["name"].ToString ();
 
-			string ext = pluginInfo["ext"].ToString();
-			string path = Path.Combine(_PluginDirectory, name+"."+ext);
+			string ext = pluginInfo ["ext"].ToString ();
+			string path = Path.Combine (_PluginDirectory, name + "." + ext);
 
 			if (System.IO.File.Exists (path)) {
 				// REMOVE PLUGIN
-				CommitRemove(name, path);
-				CommitDelete(name, path);
+				CommitRemove (name, path);
+				if (IsPluginInstalled (name)) {
+					CommitDelete (name, path);
+				}
 			} else {
 				return Error("File does not exist");
 			}
 
 			return true;
+		}
+
+		internal void Shutdown()
+		{
 		}
 	}
 }
