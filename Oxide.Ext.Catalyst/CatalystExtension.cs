@@ -15,6 +15,7 @@ namespace Oxide.Ext.Catalyst
 		public static CatalystExtension Instance { get; private set; }
 		public static Libraries.Catalyst CatalystLibrary { get; private set; }
 		public static Plugins.Catalyst CatalystPlugin { get; private set; }
+
 		public CatalystExtension(ExtensionManager manager) : base(manager)
 		{
 			CatalystExtension.Instance = this;

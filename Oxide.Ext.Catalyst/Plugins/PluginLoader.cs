@@ -29,7 +29,8 @@ namespace Oxide.Ext.Catalyst.Plugins
 
 	    public override Plugin Load (string directory, string name)
 		{
-			switch (name) {
+			switch (name) 
+			{
 				case "Catalyst":
 					Plugins.Catalyst catalystPlugin = new Plugins.Catalyst (Extension);
 					LoadedPlugins.Add (name, catalystPlugin);

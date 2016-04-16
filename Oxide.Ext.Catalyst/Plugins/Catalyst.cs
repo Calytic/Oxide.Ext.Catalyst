@@ -38,7 +38,8 @@ namespace Oxide.Ext.Catalyst.Plugins
 	    private void Init ()
 		{
 			library = Interface.Oxide.GetLibrary<Oxide.Ext.Catalyst.Libraries.Catalyst> ("Catalyst");
-			if (library == null) {
+			if (library == null) 
+			{
 				Interface.Oxide.LogError("[Catalyst] Library not found");
 				return;
 			}
@@ -51,47 +52,88 @@ namespace Oxide.Ext.Catalyst.Plugins
 			command.AddConsoleCommand ("catalyst.config", this, "ccConfig");
 			command.AddConsoleCommand ("catalyst.search", this, "ccSearch");
 			command.AddConsoleCommand ("catalyst.info", this, "ccInfo");
+			command.AddConsoleCommand ("catalyst.debug", this, "ccDebug");
 
-			if (library.Settings.Debug) {
+			if (library.Settings.Debug) 
+			{
 				Interface.Oxide.LogInfo ("[Catalyst] Loaded");
 			}
 		}
 
-		[HookMethod("ccConfig")]
-		void ccConfig (ConsoleSystem.Arg arg)
+		[HookMethod("ccDebug")]
+		void ccDebug (ConsoleSystem.Arg arg)
 		{
 			if (arg.connection != null) {
 				arg.ReplyWith ("Permission Denied");
 				return;
 			}
 
-			if (arg.Args != null && arg.Args.Length == 2 || arg.Args.Length == 3) {
+			if (arg.Args.Length == 1) {
+				bool debug;
+				if(bool.TryParse(arg.Args[0], out debug))
+				{
+					library.Settings.Debug = debug;
+				}
+				
+			} else {
+				library.Settings.Debug = !library.Settings.Debug;
+			}
+
+			if(library.Settings.Debug) {
+				Interface.Oxide.LogInfo("[Catalyst] Debug mode: enabled");
+			} else {
+				Interface.Oxide.LogInfo("[Catalyst] Debug mode: disabled");
+			}
+		}
+
+		[HookMethod("ccConfig")]
+		void ccConfig (ConsoleSystem.Arg arg)
+		{
+			if (arg.connection != null) 
+			{
+				arg.ReplyWith ("Permission Denied");
+				return;
+			}
+
+			if (arg.Args != null && arg.Args.Length == 2 || arg.Args.Length == 3) 
+			{
 				Plugin plugin = plugins.Find (arg.Args [0]);
 
 				if (plugin != null) {
 					string key = arg.Args [1];
 					string[] parts = key.Split (new char[] { '.' });
 
-					if (arg.Args.Length == 2) {
+					if (arg.Args.Length == 2) 
+					{
 						object val = plugin.Config.Get (parts);
-						if (val != null) {
+						if (val != null) 
+						{
 							Interface.Oxide.LogInfo (key + " : " + val.ToString ());
-						} else {
+						} 
+						else 
+						{
 							Interface.Oxide.LogInfo ("No setting found");
 						}
-					} else {
+					} 
+					else 
+					{
 						object val = arg.Args [2];
 						bool bl = false;
-						if (bool.TryParse (val.ToString (), out bl)) {
+						if (bool.TryParse (val.ToString (), out bl)) 
+						{
 							val = bl;
 						}
 						plugin.Config.Set (parts, val);
 						plugin.Config.Save ();
 					}
-				} else {
+				} 
+				else 
+				{
 					Interface.Oxide.LogInfo ("No plugin found");
 				}
-			} else {
+			}
+			else 
+			{
 				Interface.Oxide.LogInfo ("catalyst.config setting [value]");
 			}
 		}
@@ -105,20 +147,27 @@ namespace Oxide.Ext.Catalyst.Plugins
 				return;
 			}
 
-			if (arg.Args != null && arg.Args.Length == 1) {
+			if (arg.Args != null && arg.Args.Length == 1) 
+			{
 				string name = arg.Args [0];
 
-				if (!library.Settings.SourceList.Contains (name)) {
+				if (!library.Settings.SourceList.Contains (name)) 
+				{
 					library.Settings.SourceList.Add (name);
 					Interface.Oxide.LogInfo ("[Catalyst] Source added!");
-				} else {
+				} 
+				else 
+				{
 					library.Settings.SourceList.Remove (name);
 					Interface.Oxide.LogInfo ("[Catalyst] Source removed!");
 				}
-			} else {
+			} 
+			else 
+			{
 				StringBuilder sb = new StringBuilder ();
 				sb.AppendLine ("Sources:");
-				foreach (string source in library.Settings.SourceList) {
+				foreach (string source in library.Settings.SourceList) 
+				{
 					sb.AppendLine (source);
 				}
 
@@ -129,29 +178,37 @@ namespace Oxide.Ext.Catalyst.Plugins
 		[HookMethod("ccSearch")]
 		void ccSearch (ConsoleSystem.Arg arg)
 		{
-			if (arg.connection != null) {
+			if (arg.connection != null) 
+			{
 				arg.ReplyWith ("Permission Denied");
 				return;
 			}
 
-			if (arg.Args != null && arg.Args.Length > 0) {
+			if (arg.Args != null && arg.Args.Length > 0) 
+			{
 				string name = string.Join(" ", arg.Args).Trim();;
 				string[] plugins = library.FindPlugin (name);
 
-				if (plugins.Length > 0) {
+				if (plugins.Length > 0) 
+				{
 					StringBuilder sb = new StringBuilder();
 					int i = 1;
 					sb.AppendLine ("Found (" + plugins.Length + ")");
-					foreach (string plugin in plugins) {
+					foreach (string plugin in plugins) 
+					{
 						sb.AppendLine (i + ". " + plugin);
 						i++;
 					}
 
 					Interface.Oxide.LogInfo(sb.ToString());
-				} else {
+				} 
+				else 
+				{
 					Interface.Oxide.LogInfo("No Plugin Found!");
 				}
-			} else {
+			} 
+			else 
+			{
 				Interface.Oxide.LogInfo("catalyst.search PluginName [PluginName] ...");
 			}
 		}
@@ -159,19 +216,24 @@ namespace Oxide.Ext.Catalyst.Plugins
 		[HookMethod("ccUpdate")]
 		void ccUpdate (ConsoleSystem.Arg arg)
 		{
-			if (arg.connection != null) {
+			if (arg.connection != null) 
+			{
 				arg.ReplyWith ("Permission Denied");
 				return;
 			}
 
-			if (arg.Args != null && arg.Args.Length > 0 && arg.Args [0] != "*") {
+			if (arg.Args != null && arg.Args.Length > 0 && arg.Args [0] != "*") 
+			{
 				library.BeginCommit ();
-				foreach (string name in arg.Args) {
-					if (library.Settings.Debug) {
+				foreach (string name in arg.Args) 
+				{
+					if (library.Settings.Debug) 
+					{
 						Interface.Oxide.LogInfo ("[Catalyst] Updating " + name);
 					}
 
-					if (!library.PluginExists (name) && arg.Args.Length == 1) {
+					if (!library.PluginExists (name) && arg.Args.Length == 1) 
+					{
 						ccSearch (arg);
 						return;
 					}
@@ -179,11 +241,15 @@ namespace Oxide.Ext.Catalyst.Plugins
 				}
 
 				library.EndCommit ();
-			} else {
+			} 
+			else 
+			{
 				library.BeginCommit ();
 
-				foreach (KeyValuePair<string, string> kvp in library.Settings.Require) {
-					if (library.PluginExists (kvp.Key)) {
+				foreach (KeyValuePair<string, string> kvp in library.Settings.Require) 
+				{
+					if (library.PluginExists (kvp.Key)) 
+					{
 						HandleResult (library.UpdatePlugin (kvp.Key), "Updating " + kvp.Key);
 					}
 				}
@@ -194,28 +260,40 @@ namespace Oxide.Ext.Catalyst.Plugins
 		[HookMethod("ccRequire")]
 		void ccRequire (ConsoleSystem.Arg arg)
 		{
-			if (arg.connection != null) {
+			if (arg.connection != null) 
+			{
 				arg.ReplyWith ("Permission Denied");
 				return;
 			}
 
-			if (arg.Args != null && arg.Args.Length > 0) {
+			if (arg.Args != null && arg.Args.Length > 0) 
+			{
 				library.BeginCommit ();
-				foreach (string name in arg.Args) {
-					if (library.Settings.Debug) {
-						Interface.Oxide.LogInfo ("[Catalyst] Requiring " + name);
-					}
 
-					if (!library.PluginExists (name)) {
-						ccSearch (arg);
-						return;
-					}
-
-					HandleResult (library.InstallPlugin (name), "Installing " + name);
+				string name = arg.Args [0];
+				string version = "*";
+				if (arg.Args.Length == 2) 
+				{
+					version = arg.Args[1];
 				}
 
+				if (library.Settings.Debug) 
+				{
+					Interface.Oxide.LogInfo ("[Catalyst] Requiring " + name);
+				}
+
+				if (!library.PluginExists (name, version)) 
+				{
+					ccSearch (arg);
+					return;
+				}
+
+				HandleResult (library.InstallPlugin (name, version), "Installing " + name);
+
 				library.EndCommit ();
-			} else {
+			} 
+			else 
+			{
 				Interface.Oxide.LogInfo ("catalyst.require PluginName [PluginName] ..." );
 			}
 		}
@@ -223,15 +301,18 @@ namespace Oxide.Ext.Catalyst.Plugins
 		[HookMethod("ccRemove")]
 		void ccRemove (ConsoleSystem.Arg arg)
 		{
-			if (arg.connection != null) {
+			if (arg.connection != null) 
+			{
 				arg.ReplyWith ("Permission Denied");
 				return;
 			}
 
-			if (arg.Args != null && arg.Args.Length > 0) {
+			if (arg.Args != null && arg.Args.Length > 0) 
+			{
 				library.BeginCommit();
 				foreach (string name in arg.Args) {
-					if (library.Settings.Debug) {
+					if (library.Settings.Debug) 
+					{
 						Interface.Oxide.LogInfo ("[Catalyst] Removing " + name);
 					}
 
@@ -251,23 +332,20 @@ namespace Oxide.Ext.Catalyst.Plugins
 				return;
 			}
 
-			int errors = 0;
+			bool errors = false;
 
-			if (library.Settings.Debug) {
+			if (library.Settings.Debug) 
+			{
 				Interface.Oxide.LogInfo ("[Catalyst] Validating");
 			}
 
 			library.BeginCommit();
-			foreach (KeyValuePair<string, string> kvp in library.Settings.Require) {
-				var obj = library.GetPluginInfo (kvp.Key);
-				if (obj == null) {
-					Interface.Oxide.LogWarning ("[Catalyst]" + kvp.Key + " does not exist");
-					errors++;
-				}
-			}
+			HandleResult(library.Validate(), "Validating");
+			errors = library.HasErrors;
 			library.EndCommit();
 
-			if (errors > 0) {
+			if (errors) 
+			{
 				Interface.Oxide.LogWarning ("[Catalyst] Validation failed");
 			} else {
 				Interface.Oxide.LogInfo ("[Catalyst] Validation success!");
@@ -277,16 +355,19 @@ namespace Oxide.Ext.Catalyst.Plugins
 		[HookMethod("ccInfo")]
 		void ccInfo (ConsoleSystem.Arg arg)
 		{
-			if (arg.connection != null) {
+			if (arg.connection != null) 
+			{
 				arg.ReplyWith ("Permission Denied");
 				return;
 			}
 
-			if (arg.Args != null && arg.Args.Length == 1) {
+			if (arg.Args != null && arg.Args.Length == 1) 
+			{
 				string name = arg.Args [0];
 
 				library.BeginCommit ();
-				if (!library.PluginExists (name)) {
+				if (!library.PluginExists (name)) 
+				{
 					Interface.Oxide.LogWarning ("[Catalyst] No plugin found");
 					return;
 				}
@@ -295,7 +376,8 @@ namespace Oxide.Ext.Catalyst.Plugins
 
 				StringBuilder sb = new StringBuilder ();
 
-				if (pluginInfo ["plugin"] == null) {
+				if (pluginInfo ["plugin"] == null) 
+				{
 					Interface.Oxide.LogWarning ("[Catalyst] Plugin invalid");
 				}
 
@@ -309,7 +391,8 @@ namespace Oxide.Ext.Catalyst.Plugins
 				sb.AppendLine("Description: " + desc);
 
 				var requires = pluginInfo ["plugin"] ["require"];
-				if (requires != null) {
+				if (requires != null) 
+				{
 					sb.AppendLine("Require: "); 
 					foreach (string require in requires) {
 						sb.AppendLine(require);	
@@ -319,19 +402,28 @@ namespace Oxide.Ext.Catalyst.Plugins
 				Interface.Oxide.LogInfo (sb.ToString());
 
 				library.EndCommit();
-			} else {
+			} 
+			else 
+			{
 				Interface.Oxide.LogInfo ("catalyst.info PluginName");
 			}
 		}
 
-		void HandleResult(object result, string action) {
-			if ((result is string || result is bool || result == null) && !library.IsCommitting) {
-				if (result is string) {
+		void HandleResult(object result, string action) 
+		{
+			if ((result is string || result is bool || result == null) && !library.IsCommitting) 
+			{
+				if (result is string) 
+				{
 					Interface.Oxide.LogError ("[Catalyst] " + result.ToString ());
-				} else if (result is bool && (bool)result == false) {
+				} 
+				else if (result is bool && (bool)result == false) 
+				{
 					Interface.Oxide.LogError ("[Catalyst] Unknown Error: " + action);
 				}
-			} else if(result is bool && (bool)result == true) {
+			} 
+			else if(result is bool && (bool)result == true) 
+			{
 				Interface.Oxide.LogInfo ("[Catalyst] " + action + " queued.");
 			}
 		}

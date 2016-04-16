@@ -1,10 +1,20 @@
 ## Catalyst 
 
-Version: ALPHA-0.0.3
+Version: ALPHA-0.0.4
 
 Plugin & dependency management extension by [RustServers.IO](http://rustservers.io) for the [Oxide](http://oxidemod.org) modding framework.
 
+### Features
+
+* Free & Open-Source
+* Automaticaly install plugins and all of their dependencies
+* Automatically update an individual plugin or every plugin
+* Avoids circular dependencies && dependency hell
+
 ### Installation
+
+1. Move Oxide.Ext.Catalyst into your RustDedicated_Data/Managed folder
+2. Restart server
 
 ### Usage
 
@@ -22,7 +32,7 @@ Plugin & dependency management extension by [RustServers.IO](http://rustservers.
 
   Installs specified plugins on server
 
-  ````catalyst.require PluginName [PluginName] [...]````
+  ````catalyst.require PluginName [Version]````
 
 * **Remove**
 
