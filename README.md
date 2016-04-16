@@ -40,12 +40,6 @@ Plugin & dependency management extension by [RustServers.IO](http://rustservers.
 
   ````catalyst.remove PluginName [PluginName] [...]````
 
-* **Source Service**
-
-  Add/Remove source service where plugins made be found
-
-  ````catalyst.source http://source.url.com````
-
 * **Configuration**
 
   Command-line editing of plugin configuration files (alpha)
@@ -69,6 +63,20 @@ Plugin & dependency management extension by [RustServers.IO](http://rustservers.
   Check if requirements are valid
 
   ``catalyst.validate``
+
+### Sourcing
+
+Plugins installed by this extension are currently not sourced directly from Oxide.
+
+Catalyst sources plugins directly from GitHub, the default repository may be found here [Calytic/oxideplugins](https://github.com/Calytic/oxideplugins)
+
+In order to add or remove sources:
+
+* **Source Service**
+
+  Add/Remove source service where plugins made be found
+
+  ````catalyst.source http://source.url.com````
 
 ### Contribute
 
