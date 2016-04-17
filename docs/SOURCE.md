@@ -45,6 +45,8 @@ The standards set below are still subject to substantial change during the ALPHA
 }
 ````
 
+#### Example #2
+
 ``http://rustservers.io/p/HumanNPC.json``
 
 **JSON Result**:
@@ -114,7 +116,7 @@ Provides a list of plugins where given search terms are found anywhere in the pl
 
 ## Using Your New Service
 
-* Add/Remove source service where plugins made be found
+* Add/Remove source service where plugins are found
 
   ````catalyst.source http://my.source.com````
 
