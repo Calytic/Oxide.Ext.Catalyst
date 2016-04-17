@@ -1,6 +1,6 @@
 ## Catalyst 
 
-Version: ALPHA-0.0.4
+**Version**: ALPHA-0.0.5
 
 Plugin & dependency management extension by [RustServers.IO](http://rustservers.io) for the [Oxide](http://oxidemod.org) modding framework.
 
