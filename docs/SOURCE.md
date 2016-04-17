@@ -9,6 +9,7 @@ The standards set below are still subject to substantial change during the ALPHA
 ### Plugin Information
 
 **URL**: ``http://example.org/p/{PluginName}.json``
+
 **URL**: ``http://example.org/p/{PluginName}/{PluginVersion}.json`` **(still in development)**
 
 #### Example
@@ -16,7 +17,7 @@ The standards set below are still subject to substantial change during the ALPHA
 ``http://rustservers.io/p/EntityOwner.json``
 
 **JSON Result**:
-``
+````
 {
    "name":"EntityOwner",
    "ext":"cs",
@@ -42,12 +43,12 @@ The standards set below are still subject to substantial change during the ALPHA
    "src":"https:\/\/raw.githubusercontent.com\/Calytic\/oxideplugins\/master\/rust\/EntityOwner.cs",
    "version":"3.0.3"
 }
-``
+````
 
 ``http://rustservers.io/p/HumanNPC.json``
 
 **JSON Result**:
-``
+````
 {
    "name":"HumanNPC",
    "ext":"cs",
@@ -74,7 +75,7 @@ The standards set below are still subject to substantial change during the ALPHA
    "src":"https:\/\/raw.githubusercontent.com\/Calytic\/oxideplugins\/master\/rust\/HumanNPC.cs",
    "version":"0.3.2"
 }
-``
+````
 
 ## Search Plugins
 
@@ -87,7 +88,7 @@ Provides a list of plugins where given search terms are found anywhere in the pl
 ``http://rustservers.io/s/Anti.json``
 
 **JSON Result**:
-``
+````
 {
    "data":[
       "AntiSpeedHack",
@@ -109,7 +110,7 @@ Provides a list of plugins where given search terms are found anywhere in the pl
       "AntiGlitch"
    ]
 }
-``
+````
 
 ## Using Your New Service
 
