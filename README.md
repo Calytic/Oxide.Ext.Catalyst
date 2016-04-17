@@ -13,7 +13,7 @@ Plugin & dependency management extension by [RustServers.IO](http://rustservers.
 
 ### Installation
 
-1. Move Oxide.Ext.Catalyst into your RustDedicated_Data/Managed folder
+1. Move ``Oxide.Ext.Catalyst.dll`` into the ``RustDedicated_Data/Managed`` folder
 2. Restart server
 
 ### Usage
@@ -66,9 +66,13 @@ Plugin & dependency management extension by [RustServers.IO](http://rustservers.
 
 ### Sourcing
 
-Plugins installed by this extension are currently not sourced directly from Oxide.
+Plugins available for installation through Catalyst are indirectly sourced from Oxide.
 
-Catalyst sources plugins directly from GitHub, the default repository may be found here [Calytic/oxideplugins](https://github.com/Calytic/oxideplugins)
+Original authors are attributed and their corresponding documentation and possible licensing information is included.
+
+If you identify any misattribution or a missing license please do not hesitate to contact us.
+
+Plugins are sourced directly from GitHub, the default repository may be found here [Calytic/oxideplugins](https://github.com/Calytic/oxideplugins)
 
 In order to add or remove sources:
 
