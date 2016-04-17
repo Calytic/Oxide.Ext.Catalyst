@@ -14,7 +14,7 @@ namespace Oxide.Ext.Catalyst
 	{
 		public static CatalystExtension Instance { get; private set; }
 		public static Libraries.Catalyst CatalystLibrary { get; private set; }
-		public static Plugins.Catalyst CatalystPlugin { get; private set; }
+		public static Plugins.CatalystPlugin CatalystPlugin { get; private set; }
 
 		public CatalystExtension(ExtensionManager manager) : base(manager)
 		{
@@ -33,7 +33,7 @@ namespace Oxide.Ext.Catalyst
 
 		public override void Load()
 		{
-			this.Manager.RegisterPluginLoader(new Plugins.PluginLoader(this));
+			Manager.RegisterPluginLoader(new Plugins.PluginLoader(this));
 			CatalystLibrary = new Libraries.Catalyst(this);
 			Manager.RegisterLibrary("Catalyst", CatalystLibrary);
 		}

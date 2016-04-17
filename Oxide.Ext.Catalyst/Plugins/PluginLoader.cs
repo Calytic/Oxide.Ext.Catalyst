@@ -1,4 +1,5 @@
-﻿using System;
+﻿// COPYRIGHT 2016 RUSTSERVERS.IO
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -32,7 +33,7 @@ namespace Oxide.Ext.Catalyst.Plugins
 			switch (name) 
 			{
 				case "Catalyst":
-					Plugins.Catalyst catalystPlugin = new Plugins.Catalyst (Extension);
+					Plugins.RustPlugin catalystPlugin = new Plugins.RustPlugin (Extension);
 					LoadedPlugins.Add (name, catalystPlugin);
 					return (Plugin) catalystPlugin;
 			    default:

@@ -1,4 +1,5 @@
-﻿using System;
+﻿// COPYRIGHT 2016 RUSTSERVERS.IO
+using System;
 using System.Collections.Generic;
 
 using Oxide.Core;

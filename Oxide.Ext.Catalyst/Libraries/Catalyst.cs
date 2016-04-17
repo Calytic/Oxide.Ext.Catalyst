@@ -397,7 +397,7 @@ namespace Oxide.Ext.Catalyst.Libraries
 				}
 			}
 
-			return "No plugin found";
+			return Error("No plugin found");
 		}
 
 		internal object InstallPlugin (JObject pluginInfo, string version = "*")
