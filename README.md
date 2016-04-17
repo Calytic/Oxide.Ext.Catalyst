@@ -74,11 +74,11 @@ If you identify any misattribution or a missing license please do not hesitate t
 
 Plugins are sourced directly from GitHub, the default repository may be found here [Calytic/oxideplugins](https://github.com/Calytic/oxideplugins)
 
-In order to add or remove sources:
+More information on the intermediate web service used for Catalyst may be found in [SOURCE.md](https://github.com/Calytic/Oxide.Ext.Catalyst/blob/master/docs/SOURCE.md)
 
 * **Source Service**
 
-  Add/Remove source service where plugins made be found
+  Add/Remove source service where plugins are found
 
   ````catalyst.source http://source.url.com````
 
