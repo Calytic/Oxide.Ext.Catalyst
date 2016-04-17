@@ -7,9 +7,9 @@ Plugin & dependency management extension by [RustServers.IO](http://rustservers.
 ### Features
 
 * Free & Open-Source
-* Automaticaly install plugins and all of their dependencies
+* Automatically install plugins and all of their dependencies
 * Automatically update an individual plugin or every plugin
-* Avoids circular dependencies && dependency hell
+* Avoids circular dependencies & dependency hell
 
 ### Installation
 
