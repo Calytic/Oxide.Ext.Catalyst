@@ -30,9 +30,15 @@ Plugin & dependency management extension by [RustServers.IO](http://rustservers.
 
 * **Require**
 
-  Installs specified plugins on server
+  Installs specified plugin
 
   ````catalyst.require PluginName [Version]````
+  
+* **Require**
+
+  Installs all specified plugins
+
+  ````catalyst.require PluginName [PluginName] ...````
 
 * **Remove**
 
@@ -71,8 +77,6 @@ Plugins available for installation through Catalyst are indirectly sourced from 
 Original authors are attributed and their corresponding documentation and possible licensing information is included.
 
 If you identify any misattribution or a missing license please do not hesitate to contact us.
-
-Plugins are sourced directly from GitHub, the default repository may be found here [Calytic/oxideplugins](https://github.com/Calytic/oxideplugins)
 
 More information on the intermediate web service used for Catalyst may be found in [SOURCE.md](https://github.com/Calytic/Oxide.Ext.Catalyst/blob/master/docs/SOURCE.md)
 
