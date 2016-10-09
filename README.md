@@ -34,11 +34,11 @@ Plugin & dependency management extension by [RustServers.IO](http://rustservers.
 
   ````catalyst.require PluginName [Version]````
   
-* **Require**
+* **RequireAll**
 
   Installs all specified plugins
 
-  ````catalyst.require PluginName [PluginName] ...````
+  ````catalyst.requireall PluginName [PluginName] ...````
 
 * **Remove**
 
