@@ -39,8 +39,8 @@ The standards set below are still subject to substantial change during the ALPHA
          "rust"
       ]
    },
-   "doc":"https:\/\/raw.githubusercontent.com\/Calytic\/oxideplugins\/master\/rust\/EntityOwner.md",
-   "src":"https:\/\/raw.githubusercontent.com\/Calytic\/oxideplugins\/master\/rust\/EntityOwner.cs",
+   "doc":"path/to/EntityOwner.md",
+   "src":"path/to/EntityOwner.cs",
    "version":"3.0.3"
 }
 ````
@@ -73,8 +73,8 @@ The standards set below are still subject to substantial change during the ALPHA
          "rust"
       ]
    },
-   "doc":"https:\/\/raw.githubusercontent.com\/Calytic\/oxideplugins\/master\/rust\/HumanNPC.md",
-   "src":"https:\/\/raw.githubusercontent.com\/Calytic\/oxideplugins\/master\/rust\/HumanNPC.cs",
+   "doc":"path/to/HumanNPC.md",
+   "src":"path/to/HumanNPC.cs",
    "version":"0.3.2"
 }
 ````
