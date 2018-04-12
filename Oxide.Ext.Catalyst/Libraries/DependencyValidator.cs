@@ -10,66 +10,67 @@ namespace Oxide.Ext.Catalyst
 	{
 		Libraries.Catalyst library;
 		List<string> validatorVersions = new List<string> ();
-		List<string> validatorPlugins = new List<string>();
+		List<string> validatorPlugins = new List<string> ();
 
-		public DependencyValidator(Libraries.Catalyst library) 
+		public DependencyValidator (Libraries.Catalyst library)
 		{
 			this.library = library;
 		}
 
-		public bool Passes() 
+		public bool Passes ()
 		{
-			CheckInAll();
+			library.DebugLog ("Checking in plugins");
+			try {
+				CheckInAll ();
+			} catch (Exception e) {
+
+			}
 
 			return !library.HasErrors;
 		}
 
-		private void CheckInAll (Dictionary<string, string> require = null)
+		public void Clear ()
 		{
-			if (require == null) 
-			{
+			validatorPlugins.Clear ();
+			validatorVersions.Clear ();
+		}
+
+		void CheckInAll (Dictionary<string, string> require = null)
+		{
+			if (require == null) {
 				require = library.Settings.Require;
 			}
 
-			foreach (KeyValuePair<string, string> kvp in require) 
-			{
+			foreach (KeyValuePair<string, string> kvp in require) {
 				var obj = library.GetPluginInfo (kvp.Key);
-				if (obj == null) 
-				{
+				if (obj == null) {
 					library.Error (kvp.Key + " does not exist or invalid");
-				} 
-				else 
-				{
-					CheckIn(obj);
+				} else {
+					CheckIn (obj);
 				}
 			}
 		}
 
-		private void CheckIn (JObject pluginInfo)
+		void CheckIn (JObject pluginInfo)
 		{
-			string pluginName = pluginInfo ["name"].ToString ();
-			string versionSig = pluginName + "-" + pluginInfo ["version"].ToString ();
-			if (validatorPlugins.Contains (pluginName)) 
-			{
-				if (!validatorVersions.Contains (versionSig)) 
-				{
-					library.Error("Cannot resolve multiple versions of same plugin: " + pluginName);
+
+			var pluginName = pluginInfo ["name"].ToString ();
+			var versionSig = pluginName + "-" + pluginInfo ["version"];
+			if (validatorPlugins.Contains (pluginName)) {
+				if (!validatorVersions.Contains (versionSig)) {
+					library.Error ("Cannot resolve multiple versions of same plugin: " + pluginName);
 					return;
 				}
-			} 
-			else 
-			{
+			} else {
 				validatorPlugins.Add (pluginName);
 			}
 
-			if (!validatorVersions.Contains (versionSig)) 
-			{
+			if (!validatorVersions.Contains (versionSig)) {
 				validatorVersions.Add (versionSig);
 
 				var requires = pluginInfo ["plugin"] ["require"];
-				if (requires != null) 
-				{
-					CheckInAll(requires.ToObject<Dictionary<string, string>>());
+				if (requires != null) {
+					CheckInAll (requires.ToObject<Dictionary<string, string>> ());
 				}
 			}
 		}
