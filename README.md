@@ -1,8 +1,8 @@
 ## Catalyst 
 
-**Version**: ALPHA-0.0.8
+**Version**: 1.0.6
 
-Plugin & dependency management extension by [RustServers.IO](http://rustservers.io) for the [Oxide](http://oxidemod.org) modding framework.
+Plugin & dependency management extension by [RustServers.IO](http://rustservers.io) for the [Oxide](https://oxidemod.org)/[uMod](https://umod.org) modding framework.
 
 ### Features
 
@@ -10,6 +10,10 @@ Plugin & dependency management extension by [RustServers.IO](http://rustservers.
 * Automatically install plugins and all of their dependencies
 * Automatically update an individual plugin or every plugin
 * Avoids circular dependencies & dependency hell
+
+### Download
+
+Obtain the latest version of Catalyst from the [Releases](https://github.com/Calytic/Oxide.Ext.Catalyst/releases) page.
 
 ### Installation
 
@@ -36,7 +40,7 @@ Plugin & dependency management extension by [RustServers.IO](http://rustservers.
   
 * **RequireAll**
 
-  Installs all specified plugins
+  Installs all specified plugins (using latest versions)
 
   ````catalyst.requireall PluginName [PluginName] ...````
 
@@ -72,7 +76,7 @@ Plugin & dependency management extension by [RustServers.IO](http://rustservers.
 
 ### Sourcing
 
-Plugins available for installation through Catalyst are indirectly sourced from Oxide.
+Plugins available for installation through Catalyst are indirectly sourced only from [uMod.org](https://umod.org).
 
 Original authors are attributed and their corresponding documentation and possible licensing information is included.
 
